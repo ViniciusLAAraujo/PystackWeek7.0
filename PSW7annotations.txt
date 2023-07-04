@@ -1,0 +1,147 @@
+Missing in PDF 01 or futher explanations
+Class 01
+settings.py:
+>LANGUAGE_CODE = 'pt-BR'
+>TIME_ZONE = 'America/Sao_Paulo'
+
+add
+INSTALLED_APPS = [
+'perfil'
+]
+
+Create URL for HOME:
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('home/',views.home, name= "home"),
+]
+
+Config templates (create folder outside the core(templates>bases) and app(perfil>templates), and also inside the app):
+settings.py 
+import os
+
+TEMPLATES = [
+	{
+	'DIRS': [os.path.join(BASE_DIR, 'templates')],
+	}
+]
+
+add HTML files for base and home (In home , base is extended through django template. Home changes base block from body)
+
+settings.py config create static folder under root>tamplates, inside it generate one folder for app (for now perfil) and one for geral('general'), also create js, img, and css folders inside every one of those. 
+
+STATIC_URL = '/static/'
+STATICFILES_DIRS = (os.path.join(BASE_DIR, 'templates/static'),)
+STATIC_ROOT = os.path.join('static')
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '/media/'
+
+Add static base.css under geral>css . load static into base.html via django {% load static %} tempalte and link the path to the geral base.css file via template href="{% static 'geral/css/base.css' %} ". 
+
+Add home.css under static>perfil>css , link it into home.html 
+{% load static %}
+{% block 'head' %}
+    <link rel="stylesheet" href="{% static 'perfil/css/home.css' %}">
+{% endblock 'head' %}
+
+add images to static>perfil>img and add into the html file the references to them via template exp: <img class="icone-setas" src="{% static 'perfil/img/entradas.png' %}">
+
+Add new url and view for gerenciar int perfil>urls.py and perfil>views.py  (create gerenciar.html into perfil's template)
+
+Crate models Categoria and Conta, under perfil>models.py, python manage.py makemigrations > python manage.py migrate
+
+Create admin user:
+python manage.py createsuperuser
+user:
+email:
+password:
+
+add your models for each app you desire into admin.py for the respective app, example of perfil>admin.py:
+from django.contrib import admin
+from .models import Conta, Categoria
+# Register your models here.
+
+admin.site.register(Conta)
+admin.site.register(Categoria)
+
+Edit form from gerenciar.html (action to django template of url, add csrftoken to the end of form to ensure security. andd a value to the input in the end of the form <input style="width: 100%" type="submit" class="botao-principal" value = "Send" >){django sends the request.POST param from a view as a python dictionary, setting the names of form camps as keys, and ther fillings as values}, add the path into perfil>urls.py to cadastrar_banco and the view to perfil>views.py (add imports > from .models import Conta to views, and add redirect to django.shortcuts). Make icon mandatory <input type="file" placeholder="Ícone" name="icone" required>. 
+*to send files form must have enctype='multipart/form-data', the request gets it from .FILES (not .POST)
+
+#TODO 01 add validation to other fields indo cadastrar_banco
+
+Adding messages:
+settings.py insert section for messages ant the end, and new import at the top from django.contrib.messages import constants (import it into the views that use them as well, + from django.contrib import messages )
+add messages to validations into perfil>>views.py (error, success, alerts, ...) 
+add template to validate messages into gerenciar.html, at the top of page construction
+
+Modify gerenciar view to search for all accounts, and send it to the template as a context via python dict:
+    contas = Conta.objects.all()
+    return render(request, 'gerenciar.html', {'contas': contas,})
+
+Add URL for media into core>urls.py :
+from django.contrib import admin
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('perfil/', include('perfil.urls')),
+    
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+Modify gerenciar view again to sum the total amount of accs and send it via context, also remember to change the value displayed into the html via template {{total_contas.valor__sum}}:
+total_contas = contas.aggregate(Sum('valor'))
+*from django.db.models import Sum needed
+
+Adding delete actiong to image into acc displayed in gerenciar.html:
+<a href="/perfil/deletar_banco/{{conta.id}}"><img src="{% static 'perfil/img/exit.png' %}"></a> after each acc in for
+Add path to perfil>urls.py path('deletar_banco/<int:id>', views.deletar_banco, name="deletar_banco") and add view to perfil>views.py
+
+Setting up categories:
+change form into gerenciar.html: <form action="{% url 'cadastrar_categoria' %}" method="POST">{% csrf_token %}
+add path to perfil>urls.py and view to perfil>view.py
+
+#TODO 02 validate category form camps
+
+Modify gerenciar view to search all categories and send them via context. Under perfil add path and view to update category. Change html to display categories:
+#TODONE deletar_categoria , set up  like deletar banco
+
+                    {% for categoria in categorias %}
+                        <div class="lista-categorias-main">
+                            <span><a href="{% url 'update_categoria' categoria.id %}"><img src="{% if categoria.essencial %}{% static 'perfil/img/check.png' %}{% else %}{% static 'perfil/img/exit.png' %}{% endif %}"></a>  {{categoria}}</span>
+                            <span class="categoria_valor_planejamento {% if categoria.valor_planejamento >= 0 %}positivo{% else %}negativo{% endif %}"> R$ {{categoria.valor_planejamento}}&nbsp&nbsp&nbsp<a href="/perfil/deletar_categoria/{{categoria.id}}"><img src="{% static 'perfil/img/saidas.png' %}"></a></span>
+                        </div>
+                        <br>
+                    {% endfor %}
+
+
+Create function to sum the values of some atribute (getattr) in a query set, go back and change total_contas (remove the Sum import etc, change the total value display into gerenciar.html template as well):
+create utils.py under perfil folder and create a func to calculate total(import into perfil's views from .utils import calcula_total)
+total_contas = calcula_total()
+
+
+Modify Home page:
+grab all accs, send via context along side total amount that was calculated. Implant the templates into home.html:
+
+                        {%for conta in contas%}
+                            <div class="lista-conta">
+                                <span>{{conta}}</span>
+                                <span class="total-conta">R$ {{conta.valor}}</span>
+                            </div>
+                            <br>
+                        {%endfor%}
+Change url to gerenciar:
+<a href="{% url 'gerenciar' %}" class="botao-principal">Gerenciar contas</a>
+
+*insert template for total amount
+
+
+
+
+
+
+
