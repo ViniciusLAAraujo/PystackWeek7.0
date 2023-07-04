@@ -3,7 +3,7 @@
 {% block 'head' %}
 
     <link href="{% static 'perfil/css/home.css' %}" rel="stylesheet">
-    <!---<link href="{% static 'perfil/css/gerenciar.css' %}" rel="stylesheet"--> 
+    <!---link href="{% static 'perfil/css/gerenciar.css' %}" rel="stylesheet"--> 
 
 {% endblock %}
 
@@ -47,13 +47,16 @@
                     <br>
                     <label>Banco</label>
                     <select name="banco" class="form-select">
-                        <option value="NU">Nubank</option>
+                        {% for banco_choice in  contas.model.banco_choices %}
+                        <option value="{{banco_choice.0}}">{{banco_choice.1}}</option>
+                        {% endfor %}
                     </select>
                     <br>
                     <label>Tipo</label>
                     <select name="tipo" class="form-select">
-                        <option value="pf">Pessoa física</option>
-                        <option value="pj">Pessoa jurídica</option>
+                        {% for tipo_choice in  contas.model.tipo_choices %}
+                        <option value="{{tipo_choice.0}}">{{tipo_choice.1}}</option>
+                        {% endfor %}
                     </select>
                     <br>
                     <label>Valor</label>

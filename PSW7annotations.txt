@@ -69,7 +69,7 @@ admin.site.register(Categoria)
 Edit form from gerenciar.html (action to django template of url, add csrftoken to the end of form to ensure security. andd a value to the input in the end of the form <input style="width: 100%" type="submit" class="botao-principal" value = "Send" >){django sends the request.POST param from a view as a python dictionary, setting the names of form camps as keys, and ther fillings as values}, add the path into perfil>urls.py to cadastrar_banco and the view to perfil>views.py (add imports > from .models import Conta to views, and add redirect to django.shortcuts). Make icon mandatory <input type="file" placeholder="Ícone" name="icone" required>. 
 *to send files form must have enctype='multipart/form-data', the request gets it from .FILES (not .POST)
 
-#TODO 01 add validation to other fields indo cadastrar_banco
+#TODO 01 add validation to other fields into cadastrar_banco
 
 Adding messages:
 settings.py insert section for messages ant the end, and new import at the top from django.contrib.messages import constants (import it into the views that use them as well, + from django.contrib import messages )
@@ -140,7 +140,14 @@ Change url to gerenciar:
 *insert template for total amount
 
 
+TODO CLASS 01:
+#TODONE deletar_categoria , set up  like deletar banco
 
+#Changed options from static to dynamic into gerenciar.html picker for bank types and PF-PJ types, using model 
+
+#TODONE 01 add validation to other fields into cadastrar_banco
+
+#TODONE 02 validate category form camps
 
 
 
