@@ -150,5 +150,86 @@ TODO CLASS 01:
 #TODONE 02 validate category form camps
 
 
+Class 02:
+Install new app extrato under setting.py:
+INSTALLED_APPS = [
+	'extrato',
+]
+Add parth to core urls.py
+path('extrato/', include('extrato.urls')),
+Create urls file to extrato app and add path 
 
+Create view for novo_valor under extrato app remenber to import models from perfil > from perfil.models import Conta, Categoria
 
+Create templates folderfor extrato and add novo_valor.html to it. Inside it make categories and accounts selects to dynamic via templates.
+
+Create model for Valores into extrato models.py also import models from perfil > from perfil.models import Conta, Categoria
+
+Add valores to extrato admin.py admin.site.register(Valores)
+
+Create the POST functionality for novo_valor remenber to import messages and Valores from .model:
+from .models import Valores
+from django.contrib import messages
+from django.contrib.messages import constants
+
+#TODO 01 validate form for novo_valor
+*added validations for HTTP methods into perfil views.py
+
+Create path in url and view for view_extrato. Remenber to import datetime, also add the view_extrato.html to the templates under extrato app. At least change the action of the from so it sends right beack to novo_valor
+
+#TODO 02 message acord to in or out
+
+In root templates>static add extrato folder with respective img, css and js
+
+Change form inside view_extrato.html
+
+Add functionalities for the filters inside the view, gatting the fields
+
+#TODO 03 validate filters and add dynamic time range. Also add neutral to filters
+#TODO 04 clear filters button 
+
+Install GTK3 > 
+GTK for Windows refers to the Windows port of the GTK (GIMP Toolkit) library. 
+GTK provides a set of libraries and tools for developers to create cross-platform applications with a consistent look and feel. It includes a wide range of widgets (UI elements) such as buttons, menus, text fields, and more, along with various APIs for handling user input, event handling, and graphics rendering.
+
+GTK for Windows allows developers to build native Windows applications using GTK. It provides the necessary libraries, headers, and tools to compile and run GTK-based applications on the Windows operating system. By using GTK, developers can write their application code once and deploy it on multiple platforms, including Windows, Linux, and macOS, with minimal modifications.
+
+install the weasyprint lib>
+WeasyPrint is a Python library that allows you to generate PDF documents and web page snapshots (PNG or SVG images) from HTML and CSS. It provides a convenient way to convert web content into printable documents or static images.
+
+Create path and view to exportar_pdf into extrato app. import os, settings, weasyprint and render_to_string (converts to html without httpresponse of render) in views: from django.template.loader import render_to_string, import os, from django.conf import settings and from weasyprint import HTML
+
+to save bytes im MEM from io import BytesIO: from io import BytesIO. This works so the .pdf will not be downloaded in HTML().write_pdf. Before returnning pdf seek(0)to send pointer to the beginnig of the file
+
+Import django file response to send file> from django.http import FileResponse
+
+Creathe partials folder under templates root, pieces of html
+
+Add extrato.html to partials folder and send to the url inside the button in view_extrato.html
+
+Start planejamento app , remember to put under setting.py and add the path to urls.py in core
+
+Create urls.py for planejamento app and create the view for definir_planejamento(importing Categoria from perfil.models)
+
+Create the planejamento templates folder and add definir_planejamento.html to it
+
+Create under root templates>static the planejamento folder with respective sub folders js,img and css and ass the script to js
+
+Import the jsfile into in definir.planejamento.html by :  <script src="{% static 'planejamento/js/definir_planejamento.js' %}"></script> and add functionality to the button by : onclick="update_valor_planejamento_categoria({{categoria.id}})" add dynamic ids to the inputs inside the .html by: id="valor-categoria-{{categoria.id}}"
+
+*Change input type to text to see the values. Since text values were being typed in js with , separator . Replaced them into the function when recieving : novo_valor = novo_valor.replace(',', 'temp').replace('.', ',').replace('temp', '.')
+
+Create the URL to update categories by adding path and view inside planejamento app (remembering the required imports). json library needed cause request was not via POST (csrf exempt as example, but this is not great practice)
+
+#TODO 05 validate update_valor_categoria request 
+
+Create path and view to ver_planejamento under the planejamento app. Also add ver_planejamento.html to the templates folder (under the app)
+
+#TODO 06 fix if values 0 
+
+Add functions to the Categories model, so it returns the expended amount (in the month) .*Import the datetime and from .utils import calcula_total Cast to int() the percentage to avoid , . diferences. **ADD .filter(tipo='S') to total_gasto
+#TODONE use calcula total from utils
+
+#TODO 07 make it so total_gasto could recive time ranges
+
+#TODO 08 Add total bar to html in ver_planejamento.html
