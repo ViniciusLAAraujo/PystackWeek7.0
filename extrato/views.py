@@ -10,6 +10,7 @@ from django.conf import settings
 from weasyprint import HTML
 from io import BytesIO
 from django.http import FileResponse
+from .utils import filterValues
 
 
 # Create your views here.
@@ -26,8 +27,46 @@ def novo_valor(request):
         data = request.POST.get('data')
         conta = request.POST.get('conta')
         tipo = request.POST.get('tipo')
+
+        if ',' in valor:
+            valor = valor.replace(',', 'temp').replace('.', ',').replace('temp', '.')
         
-        #TODO validate this form
+        # try: 
+        #     datetime (data)
+        # except:
+        #     messages.add_message(request, constants.ERROR, 'Not a valid date')
+        #     return redirect('/extrato/novo_valor')
+
+        try: 
+            float (valor)
+        except:
+            messages.add_message(request, constants.ERROR, 'Not a valid value')
+
+        if len(valor.strip()) == 0 or len(descricao.strip()) == 0  or len(data.strip()) == 0:
+            messages.add_message(request, constants.ERROR, 'Entries must have value, description, and date')
+            return redirect('/extrato/novo_valor')
+        
+        try:
+            Conta.objects.get(id=conta)
+        except:
+            messages.add_message(request, constants.ERROR, 'Not a valid account')
+            return redirect('/extrato/novo_valor')
+            
+        try:
+            Categoria.objects.get(id=categoria)
+        except:
+            messages.add_message(request, constants.ERROR, 'Not a valid category')
+            return redirect('/extrato/novo_valor')
+            
+        baseType = Valores.objects.first()
+        valid_types = dict(baseType.choice_tipo).keys()
+        if  tipo not in valid_types:
+            messages.add_message(request, constants.ERROR, 'Not a valid Type')
+            return redirect('/extrato/novo_valor')
+
+        
+
+        #TODONE validate this form
 
         valores = Valores(
             valor=valor,
@@ -43,17 +82,17 @@ def novo_valor(request):
         conta = Conta.objects.get(id=conta)
 
         if tipo == 'E':
-            conta.valor += int(valor)
+            conta.valor += float(valor)
+            messages.add_message(request, constants.SUCCESS, 'Entrada ')
         else:
-            conta.valor -= int(valor)
+            conta.valor -= float(valor)
+            messages.add_message(request, constants.SUCCESS, 'Saida ')
 
-        
-        
         conta.save()
 
         
-        #TODO message should be acordding to type
-        messages.add_message(request, constants.SUCCESS, 'Categoria cadastrada com sucesso')
+        #TODONE message should be acordding to type
+        messages.add_message(request, constants.SUCCESS, 'cadastrada com sucesso')
         return redirect('/extrato/novo_valor')
     
 def view_extrato(request):
@@ -62,17 +101,23 @@ def view_extrato(request):
         categorias = Categoria.objects.all()
 
             
-        valores = Valores.objects.filter(data__month=datetime.now().month)
+        
 
         conta_get = request.GET.get('conta')
         categoria_get = request.GET.get('categoria')
+        periodo_get =  request.GET.get('periodo')
 
-        #TODO validate form and add dynamic time range. Also add neutral to filters
-        #TODO clear filters button 
+        if periodo_get in filterValues:
+            valores = filterValues[periodo_get]()
+        else:
+            valores = Valores.objects.filter(data__month=datetime.now().month)
 
-        if conta_get:
+        #TODONE validate form and add dynamic time range. Also add neutral to filters
+        #TODONE clear filters button 
+
+        if conta_get and  conta_get != "--":
             valores = valores.filter(conta__id=conta_get)
-        if categoria_get:
+        if categoria_get and categoria_get != "--":
             valores = valores.filter(categoria__id=categoria_get)
     
 

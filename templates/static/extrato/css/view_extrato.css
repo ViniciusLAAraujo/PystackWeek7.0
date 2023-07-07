@@ -34,3 +34,16 @@ tr{
     text-align: center;
 
 }
+
+.botao-clear{
+
+    background-color: transparent;
+    color: white;
+    text-decoration: none;
+    border: 2px solid red;
+    padding: 10px;
+    border-radius: 15px;
+    width: 100%;
+    display: block;
+    text-align: center;
+}

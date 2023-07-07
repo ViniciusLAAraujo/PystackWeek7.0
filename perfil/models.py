@@ -1,5 +1,5 @@
 from django.db import models
-from datetime import datetime
+from datetime import datetime, timedelta
 from .utils import calcula_total
 # Create your models here.
 
@@ -11,19 +11,52 @@ class Categoria(models.Model):
     def __str__(self):
         return self.categoria
     
-    #TODO make it so total_gasto could recive time ranges
-    def total_gasto(self):
+    #TODONE make it so total_gasto could recive time ranges
+    def valor_planejamento_div7(self):
+        return format(self.valor_planejamento/7,'.2f')
+
+    def total_gasto_CM(self):
         from extrato.models import Valores
 
         valores = Valores.objects.filter(categoria__id = self.id).filter(data__month=datetime.now().month).filter(tipo='S')
         #TODONE use calcula total from utils
         valores = calcula_total(valores,'valor')
         return valores if valores else 0
+    
+    def total_gasto_L7(self):
+        from extrato.models import Valores
+        start_date = datetime.now() - timedelta(days=7)
+        valores = Valores.objects.filter(categoria__id = self.id).filter(data__gte=start_date).filter(tipo='S')
+        #TODONE use calcula total from utils
+        valores = calcula_total(valores,'valor')
+        return valores if valores else 0
+    
+    def total_gasto_PM(self):
+        from extrato.models import Valores
+        first_day_of_current_month = datetime.now().replace(day=1)
+        last_day_of_previous_month = first_day_of_current_month - timedelta(days=1)
+        previous_month = last_day_of_previous_month.month
+        valores = Valores.objects.filter(categoria__id = self.id).filter(data__month=previous_month).filter(tipo='S')
+        #TODONE use calcula total from utils
+        valores = calcula_total(valores,'valor')
+        return valores if valores else 0
 
-    def calcula_percentual_gasto_por_categoria(self):
+    def calcula_percentual_gasto_por_categoria_CM(self):
         #try to catch ZeroDivisionError 
         try:
-            return int((self.total_gasto() * 100) / self.valor_planejamento)
+            return int((self.total_gasto_CM() * 100) / self.valor_planejamento)
+        except:
+            return 0
+    def calcula_percentual_gasto_por_categoria_L7(self):
+        #try to catch ZeroDivisionError 
+        try:
+            return int((self.total_gasto_L7() * 100) / self.valor_planejamento)
+        except:
+            return 0
+    def calcula_percentual_gasto_por_categoria_PM(self):
+        #try to catch ZeroDivisionError 
+        try:
+            return int((self.total_gasto_PM() * 100) / self.valor_planejamento)
         except:
             return 0
 

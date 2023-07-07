@@ -81,9 +81,8 @@ def cadastrar_banco(request):
 
 def deletar_banco(request, id):
     if request.method == "POST":
-        conta = Conta.objects.get(id=id)
-        
         try:
+            conta = Conta.objects.get(id=id)
             conta.delete()
         except ValidationError as e:
             error_message = e.message_dict['name'][0]
@@ -123,11 +122,12 @@ def cadastrar_categoria(request):
 
 def update_categoria(request, id):
     if request.method == "POST":
-        categoria = Categoria.objects.get(id=id)
-
-        categoria.essencial = not categoria.essencial
-
+        
         try:
+            categoria = Categoria.objects.get(id=id)
+
+            categoria.essencial = not categoria.essencial
+
             categoria.save()
         except ValidationError as e:
             error_message = e.message_dict['name'][0]
@@ -138,9 +138,8 @@ def update_categoria(request, id):
 
 def deletar_categoria(request, id):
     if request.method == "POST":
-        conta = Categoria.objects.get(id=id)
-
         try:
+            conta = Categoria.objects.get(id=id)
             conta.delete()
         except ValidationError as e:
             error_message = e.message_dict['name'][0]

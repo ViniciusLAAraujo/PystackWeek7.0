@@ -13,19 +13,64 @@
         <br>
         <br>
         <div class="row">
+            
             <div class="col-md-2 text-center">
             </div>
             <!--TODO 08 Add total bar-->
+
+            <div class="row">
+            <h1 style="text-align: center">Total Mês Atual</h1>
+                <div class="card">
+                    <div >
+                    <span style="float: left !important;">R${{total_valores_CM}}</span>
+                    <span style="float: right !important;">R${{total_categorias_limit}}</span>
+                    </div>
+                    <div class="progress">
+                    <div class="progress-bar progress-bar-striped bg-danger" role="progressbar" style="width:{{total_percentages_CM}}%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+            <form action="{% url 'ver_planejamento' %}" method="GET">
+            <div class="row">
+                <div class="col-md">
+                    <label>Período</label>
+                    <select name="periodo" class="form-select">
+                        <option value="CM">Mês atual</option>
+                        <option value="L7">Últimos 7 dias</option>
+                         <option value="PM">Mês passado</option>
+                    </select>
+                </div>  
+                <div class="col-md-2">
+                    <br>
+                    <input style="width: 100% " type="submit" class="botao-principal" value="Filtrar">
+                    <br>
+                </div>        
+            </div>
+            <br>
+            
             <div class="col-md">
                <div class="card">
                 {% for categoria in categorias %}
                     <p>{{categoria}}</p>
                     <div>
-                    <span style="float: left !important;">R$ {{categoria.total_gasto}}</span>
-                    <span style="float: right !important;">R$ {{categoria.valor_planejamento}}</span>
+                    <span style="float: left !important;">R$
+                        {% if periodo_get == 'L7' %}
+                        {{ categoria.total_gasto_L7 }}
+                        {% elif periodo_get == 'PM' %}
+                        {{ categoria.total_gasto_PM }}
+                        {% else %}
+                        {{ categoria.total_gasto_CM }}
+                        {% endif %}
+                    </span>
+                    <span style="float: right !important;">R$ 
+                        {% if periodo_get == 'L7' %}
+                        {{ categoria.valor_planejamento_div7}}
+                        {% else %}
+                        {{categoria.valor_planejamento}}
+                        {% endif %}</span>
                     </div>
                     <div class="progress">
-                        <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width: {{categoria.calcula_percentual_gasto_por_categoria}}%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar progress-bar-striped bg-info" role="progressbar" style="width:{% if periodo_get == 'L7' %}{{categoria.calcula_percentual_gasto_por_categoria_L7}}{% elif periodo_get == 'PM' %}{{categoria.calcula_percentual_gasto_por_categoria_PM}}{% else %}{{categoria.calcula_percentual_gasto_por_categoria_CM}}{% endif %}%" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                     <hr>
                 {% endfor %}

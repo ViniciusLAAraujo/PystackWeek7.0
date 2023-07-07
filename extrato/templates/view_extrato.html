@@ -17,6 +17,7 @@
             <div class="col-md">
                 <label>Conta</label>
                 <select name="conta" class="form-select">
+                    <option value="--">--------</option>
                     {% for conta in contas %}
                         <option value="{{conta.id}}">{{conta}}</option>
                     {% endfor %}
@@ -26,6 +27,7 @@
             <div class="col-md">
                 <label>Categoria</label>
                 <select name="categoria" class="form-select">
+                        <option value="--">--------</option>
                     {% for categoria in categorias %}
                         <option value="{{categoria.id}}">{{categoria}}</option>
                     {% endfor %}
@@ -35,7 +37,9 @@
             <div class="col-md">
                 <label>Período</label>
                 <select name="periodo" class="form-select">
-                    <option>Últimos 7 dias</option>
+                    <option value="CM">Mês atual</option>
+                    <option value="L7">Últimos 7 dias</option>
+                    <option value="PM">Mês passado</option>
                 </select>
             </div>
         
@@ -50,6 +54,9 @@
             </form>
             <div class="col-md-2">
                 <a href="{% url 'exportar_pdf' %}" class="botao-secundario">Exportar extrato</a>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'view_extrato' %}" class="botao-clear">Clear filters</a>
             </div>
         </div>
         <br>

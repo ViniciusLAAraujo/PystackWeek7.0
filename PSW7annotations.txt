@@ -233,3 +233,22 @@ Add functions to the Categories model, so it returns the expended amount (in the
 #TODO 07 make it so total_gasto could recive time ranges
 
 #TODO 08 Add total bar to html in ver_planejamento.html
+
+TODO CLASS 02:
+#TODONE 01 validate form for novo_valor
+
+#TODONE 02 message acord to in or out
+
+#TODONE 03 validate filters and add dynamic time range. Also add neutral to filters **LATER make applied filters stay selected in html
+
+#TODONE 04 clear filters button 
+
+#TODONE 05 validate update_valor_categoria request 
+
+#TODONE 06 fix if values 0
+
+#TODONE use calcula total from utils
+
+#TODONE 07 make it so total_gasto could recive time ranges **LATER learn about Passing arguments to model methods in Django templates
+
+#TODONE 08 Add total bar to html in ver_planejamento.html (total bar still not dynamic, only showing current month)
