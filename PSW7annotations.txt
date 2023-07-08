@@ -252,3 +252,49 @@ TODO CLASS 02:
 #TODONE 07 make it so total_gasto could recive time ranges **LATER learn about Passing arguments to model methods in Django templates
 
 #TODONE 08 Add total bar to html in ver_planejamento.html (total bar still not dynamic, only showing current month)
+
+Class 03:
+Create contas app, adding it to core's setting.py and the path in urls.py.
+
+Create urls.py file to contas, add the path to definir_contas inside urls.py and the view inside views.py (importing category)
+
+Create the app templates folder and definir_contas.html
+
+Add the models ContaPagar and Conta paga to the app's models.py (importing category)
+
+Change definir_contas to support the POST method (importing ContasPagar , messages and constants)
+
+Add models to the app's admin.py:
+from django.contrib import admin
+from .models import ContaPaga,ContaPagar
+
+admin.site.register(ContaPagar)
+admin.site.register(ContaPaga)
+
+Add path and view to ver_contas. Then add ver_contas.html to the app`s templates folder
+#TODO 01 Add month selection and change contas to hold dates, not only days
+
+
+Make contas_vencidas dynamic into ver_contas
+
+Add also proxima_vencimento and restantes to the html ass well . Using contas_vencidas as example
+
+#TODO 02 quantity report (Col with header Report and amout of every type of acc in the left side of entries in ver_contas) 
+
+#TODO 03  make pagar_conta view to linking it to the buttons "Pagar" in ver_contas.html
+
+Now create the path and view for dashboard under perfil app (importing Valores from the extrato.models). Make it so calcula_total is used insted of aggregate sum
+
+Create dashboard.html under perfil's templates forlder, add to it charts.js library import 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+add the js script to the html file **Later find a way to import it with templates
+
+Add entradas and saidas from month to home by gathering the data from Valores, filtering and sending in the home view (remember to import datetime). After this link tha contexts sent to their respective places in the home.html file and set the {% url 'novo_valor' %} to them so it redirects to add new value
+
+Add new button to ver_planejamento bellow definir_planejamento
+<a href="{% url 'ver_planejamento' %}" class="botao-principal">Ver planejamento</a>
+
+#TODO 04 Make home view dynamic for 2 Cards in the right (Saldo total, Gerenciar contas)
+
+inside perfil's utils.py add the functionto calculate equilibrio_financeiro, execute it in home view, then send via context the 2 values. 
