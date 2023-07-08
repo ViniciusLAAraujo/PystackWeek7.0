@@ -7,7 +7,7 @@ class ContaPagar(models.Model):
     categoria = models.ForeignKey(Categoria, on_delete=models.DO_NOTHING)
     descricao = models.TextField()
     valor = models.FloatField()
-    dia_pagamento = models.IntegerField()
+    data_pagamento = models.DateField()
     
     def __str__(self):
         return self.titulo

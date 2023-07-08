@@ -298,3 +298,16 @@ Add new button to ver_planejamento bellow definir_planejamento
 #TODO 04 Make home view dynamic for 2 Cards in the right (Saldo total, Gerenciar contas)
 
 inside perfil's utils.py add the functionto calculate equilibrio_financeiro, execute it in home view, then send via context the 2 values. 
+
+TODO CLASS 03:
+
+#TODONE 01 Add month selection and change contas to hold dates, not only days
+
+#TODONE 02 quantity report (Col with header Report and amout of every type of acc in the left side of entries in ver_contas) 
+
+#TODONE 03  make pagar_conta view to linking it to the buttons "Pagar" in ver_contas.html
+
+#TODONE 04 Make home view dynamic for 2 Cards in the right (Saldo total, Gerenciar contas)
+
+
+*Fixes add try except to delets to check if there are related records, change update_categoria,deletar_categoria and deletar_banco to check fot GET instead of POST

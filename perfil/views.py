@@ -6,7 +6,8 @@ from django.contrib.messages import constants
 import imghdr
 from django.core.exceptions import ValidationError
 from extrato.models import Valores
-from datetime import datetime
+from contas.models import ContaPaga, ContaPagar
+from datetime import datetime, timedelta
 #from django.http import HttpResponse
 #from django.db.models import Sum
 
@@ -22,16 +23,36 @@ def home(request):
         total_entradas = calcula_total(entradas, 'valor')
         total_saidas = calcula_total(saidas, 'valor')
 
-        #TODO 04 Make home view dynamic for 2 Cards in the right (Saldo total, Gerenciar contas)
+        #TODONE 04 Make home view dynamic for 2 Cards in the right (Saldo total, Gerenciar contas)
+
+        categorias = Categoria.objects.all()
+        categorias = categorias.filter(valor_planejamento__gt = 0)
+        total_categorias_limit =  calcula_total(categorias,'valor_planejamento')
+        total_valores_CM = 0
+        for c in categorias:
+            total_valores_CM += c.total_gasto_CM()
+        total_disp = total_categorias_limit - total_valores_CM
 
         percentual_gastos_essenciais, percentual_gastos_nao_essenciais = calcula_equilibrio_financeiro()
 
+        TODAY = datetime.now()
+        NEARDATE = TODAY + timedelta(days=5)
+        contas_pagar = ContaPagar.objects.all()
+        contas_pagas = ContaPaga.objects.all().values('conta')
+        contas_vencidas = contas_pagar.filter(data_pagamento__lt=TODAY).exclude(id__in=contas_pagas).count()
+        contas_proximas_vencimento = contas_pagar.filter(data_pagamento__lte = NEARDATE).filter(data_pagamento__gte=TODAY).exclude(id__in=contas_pagas).count()
+
         return render(request, 'home.html', {'contas': contas,
-                                              'saldo_total': saldo_total,
-                                              "total_entradas":total_entradas,
-                                              "total_saidas":total_saidas,
-                                              "percentual_gastos_essenciais":percentual_gastos_essenciais,
-                                              "percentual_gastos_nao_essenciais":percentual_gastos_nao_essenciais})
+                                            'saldo_total': saldo_total,
+                                            "total_entradas":total_entradas,
+                                            "total_saidas":total_saidas,
+                                            "percentual_gastos_essenciais":percentual_gastos_essenciais,
+                                            "percentual_gastos_nao_essenciais":percentual_gastos_nao_essenciais,
+                                            "total_categorias_limit":total_categorias_limit,
+                                            "total_valores_CM":total_valores_CM,
+                                            "total_disp":total_disp,
+                                            "n_contas_proximas":contas_proximas_vencimento,
+                                            "n_contas_vencidas":contas_vencidas})
 
 def gerenciar(request):
     if request.method == "GET":
@@ -99,10 +120,14 @@ def cadastrar_banco(request):
 
 
 def deletar_banco(request, id):
-    if request.method == "POST":
+    if request.method == "GET":
         try:
             conta = Conta.objects.get(id=id)
-            conta.delete()
+            try:
+                conta.delete()
+            except:
+                messages.add_message(request, constants.ERROR, 'Erro ao deletar, verifique se não existem registros relacionados')
+                return redirect('/perfil/gerenciar/')
         except ValidationError as e:
             error_message = e.message_dict['name'][0]
             messages.add_message(request, constants.ERROR, f'{error_message}')
@@ -140,7 +165,7 @@ def cadastrar_categoria(request):
         return redirect('/perfil/gerenciar/')
 
 def update_categoria(request, id):
-    if request.method == "POST":
+    if request.method == "GET":
         
         try:
             categoria = Categoria.objects.get(id=id)
@@ -152,14 +177,19 @@ def update_categoria(request, id):
             error_message = e.message_dict['name'][0]
             messages.add_message(request, constants.ERROR, f'{error_message}')
             return redirect('/perfil/gerenciar/')
-
+        
+        print("will return try")
         return redirect('/perfil/gerenciar/')
 
 def deletar_categoria(request, id):
-    if request.method == "POST":
+    if request.method == "GET":
         try:
             conta = Categoria.objects.get(id=id)
-            conta.delete()
+            try:
+                conta.delete()
+            except:
+                messages.add_message(request, constants.ERROR, 'Erro ao deletar, verifique se não existem registros relacionados')
+                return redirect('/perfil/gerenciar/')
         except ValidationError as e:
             error_message = e.message_dict['name'][0]
             messages.add_message(request, constants.ERROR, f'{error_message}')
@@ -175,6 +205,6 @@ def dashboard(request):
         categorias = Categoria.objects.all()
 
         for categoria in categorias:
-            dados[categoria.categoria] = calcula_total(Valores.objects.filter(categoria=categoria),'valor') 
+            dados[categoria.categoria] = calcula_total(Valores.objects.filter(categoria=categoria),'valor')
 
         return render(request, 'dashboard.html', {'labels': list(dados.keys()), 'values': list(dados.values())})

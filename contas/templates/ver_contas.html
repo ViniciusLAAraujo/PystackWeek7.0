@@ -12,12 +12,14 @@
 
         }
     </style>
+    <script src="{% static 'contas/js/pagar_conta.js' %}"></script>
 {% endblock %}
 
 {% block 'body' %}
-    <!--TODO 02 quantity report (Col with header Report and amout of every type of acc in the left side of entries in ver_contas)-->
+    
     <div class="container">
-        <br>
+        
+        
         {% if messages %}
             {% for message in messages %}
                 <div class="alert {{ message.tags }}">{{ message }}</div>
@@ -25,34 +27,38 @@
         {% endif %}
         <br>
         <div class="row">
+            <div class="col-12" style="text-align: center">
+                <h4>
+                    {% if current_month == 1 %}
+                        Janeiro
+                    {% elif current_month == 2 %}
+                        Fevereiro
+                    {% elif current_month == 3 %}
+                        Março
+                    {% elif current_month == 4 %}
+                        Abril
+                    {% elif current_month == 5 %}
+                        Maio
+                    {% elif current_month == 6 %}
+                        Junho
+                    {% elif current_month == 7 %}
+                        Julho
+                    {% elif current_month == 8 %}
+                        Agosto
+                    {% elif current_month == 9 %}
+                        Setembro
+                    {% elif current_month == 10 %}
+                        Outubro
+                    {% elif current_month == 11 %}
+                        Novembro
+                    {% elif current_month == 12 %}
+                        Dezembro
+                    {% else %}
+                    {% endif %}
+                </h4>
+            </div>
 
             <div class="col-md-8">
-                <p class="fonte-destaque" style="color: red;">Contas vencidas</p>
-                <div class="card">
-                        
-                    {% if not contas_vencidas %}
-                    <p class="fonte-destaque">Nenhuma conta vencida</p>
-
-                    {% else %}
-                        {% for conta in contas_vencidas %}
-                            <div class="linha-conta">
-                                <div class="row">
-                                    <div class="col-md text-center">
-                                        {{conta}}
-                                    </div>
-                                    <div class="col-md text-center">
-                                        Dia: {{conta.dia_pagamento}}
-                                    </div>
-                                    <div class="col-md text-center">
-                                        <a href="#" class="botao-principal">PAGAR</a>
-                                    </div> 
-                                </div>
-                            </div>
-                        {% endfor %}
-                    {% endif %}
-                       
-                </div>
-                <br>
                 <br>
                 <p class="fonte-destaque" style="color: #E96363;">Contas próximas do vencimento</p>
                 <div class="card">
@@ -68,13 +74,14 @@
                                         {{conta_p}}
                                     </div>
                                     <div class="col-md text-center">
-                                        Dia: {{conta_p.dia_pagamento}}
+                                        Data de vencimento: {{conta_p.data_pagamento}}
                                     </div>
                                     <div class="col-md text-center">
-                                        <a href="#" class="botao-principal">PAGAR</a>
+                                        <button onclick="pagar_conta_button({{conta_p.id}})" class="botao-principal">Pagar</button>
                                     </div> 
                                 </div>
                             </div>
+                            <hr>
                         {% endfor %}
                     {% endif %}
                         
@@ -96,21 +103,114 @@
                                         {{conta_r}}
                                     </div>
                                     <div class="col-md text-center">
-                                        Dia: {{conta_r.dia_pagamento}}
+                                        Data de vencimento: {{conta_r.data_pagamento}}
                                     </div>
                                     <div class="col-md text-center">
-                                        <a href="#" class="botao-principal">PAGAR</a>
+                                        <button onclick="pagar_conta_button({{conta_r.id}})" class="botao-principal">Pagar</button>
                                     </div> 
                                 </div>
                             </div>
+                            <hr>
                         {% endfor %}
                     {% endif %}    
+                </div>
+                <br>
+                <form action="{% url 'ver_contas' %}" method="GET">
+                    <div class="row">
+                        <label class="col-12" >Mês de vencimento</label>
+                        <select name="overdue_month" class="col-8">
+                            <option value="1" {% if current_month == 1 %}selected{% endif %}>Janeiro</option>
+                            <option value="2" {% if current_month == 2 %}selected{% endif %}>Fevereiro</option>
+                            <option value="3" {% if current_month == 3 %}selected{% endif %}>Março</option>
+                            <option value="4" {% if current_month == 4 %}selected{% endif %}>Abril</option>
+                            <option value="5" {% if current_month == 5 %}selected{% endif %}>Maio</option>
+                            <option value="6" {% if current_month == 6 %}selected{% endif %}>Junho</option>
+                            <option value="7" {% if current_month == 7 %}selected{% endif %}>Julho</option>
+                            <option value="8" {% if current_month == 8 %}selected{% endif %}>Agosto</option>
+                            <option value="9" {% if current_month == 9 %}selected{% endif %}>Setembro</option>
+                            <option value="10" {% if current_month == 10 %}selected{% endif %}>Outubro</option>
+                            <option value="11" {% if current_month == 11 %}selected{% endif %}>Novembro</option>
+                            <option value="12" {% if current_month == 12 %}selected{% endif %}>Dezembro</option>
+                        </select>
+                        <div class="col-md-4">
+                            <input style="width: 100%" type="submit" class="botao-principal" value="Filtrar">   
+                        </div> 
+                    </div>
+                </form>   
+                <br>
+                <p class="fonte-destaque" style="color: red;">
+                    Contas vencidas {% if current_month == 1 %}
+                        Jan
+                    {% elif current_month == 2 %}
+                        Feb
+                    {% elif current_month == 3 %}
+                        Mar
+                    {% elif current_month == 4 %}
+                        Apr
+                    {% elif current_month == 5 %}
+                        May
+                    {% elif current_month == 6 %}
+                        Jun
+                    {% elif current_month == 7 %}
+                        Jul
+                    {% elif current_month == 8 %}
+                        Aug
+                    {% elif current_month == 9 %}
+                        Sep
+                    {% elif current_month == 10 %}
+                        Oct
+                    {% elif current_month == 11 %}
+                        Nov
+                    {% elif current_month == 12 %}
+                        Dec
+                    {% else %}
+                    {% endif %}
+                </p>
+
+                <div class="card">
+                        
+                    {% if not contas_vencidas %}
+                    <p class="fonte-destaque">Nenhuma conta vencida</p>
+    
+                    {% else %}
+                        {% for conta in contas_vencidas %}
+                            <div class="linha-conta">
+                                <div class="row">
+                                    <div class="col-md text-center">
+                                        {{conta}}
+                                    </div>
+                                    <div class="col-md text-center">
+                                        Data de vencimento: {{conta.data_pagamento}}
+                                    </div>
+                                    <div class="col-md text-center">
+                                        <button onclick="pagar_conta_button({{conta.id}})" class="botao-principal">Pagar</button>
+                                    </div> 
+                                </div>
+                            </div>
+                            <hr>
+                        {% endfor %}
+                    {% endif %}
+                       
                 </div>
 
             </div>
 
+            <!--TODONE 02 quantity report (Col with header Report and amout of every type of acc in the left side of entries in ver_contas)-->
             <div class="col-md-4">
+                <h1 class="col-12">Relatorio</h1>
+                <br>
+                <h3 class="fonte-destaque" style="color: red;">Contas vencidas: {{contas_vencidas.count}}</h3>
+                <br>
+                <h3 class="fonte-destaque" style="color: #E96363;">Próximas do vencimento: {{contas_proximas_vencimento.count}}</h3>
+                <br>
+                <h3 class="fonte-destaque">Restantes: {{restantes.count}}</h3>
+                <br>
+                <h3 class="fonte-destaque" style="color: #03FCCE;">Pagas: {{contas_pagas.count}}</h3>
             </div>
+
+            
+
+            
 
         </div>
 
